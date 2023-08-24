@@ -1,6 +1,6 @@
 from flask import Flask
 
-def create_app(): #Fábricas Básicas
+def create_app(): #Fábricas Básicas flask
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'QWERTY'
 
