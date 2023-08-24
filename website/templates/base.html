@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-with, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      crossorigin="anonymous"
+    />
+
+    <title>{% block title %}Home{% endblock %}</title>
+  </head>
+
+  <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-light"
+      style="background-color: #d85372"
+    >
+      <!--Barra de navegação do bootstrap -->
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbar"
+      >
+        <span class="navbar-toggler-icon"></span>
+        <!--Botão para exibir os links abaixo de forma responsiva quando houver alteração no tamanho da pagina -->
+      </button>
+      <div class="collapse navbar-collapse" id="navbar">
+        <div class="navbar-nav">
+          <a
+            class="nav-item nav-link"
+            id="login"
+            href="/login"
+            style="color: aliceblue"
+            >Login</a
+          >
+          <a
+            class="nav-item nav-link"
+            id="signUp"
+            href="/sign-up"
+            style="color: aliceblue"
+            >Sign Up</a
+          >
+          <a
+            class="nav-item nav-link"
+            id="logout"
+            href="/logout"
+            style="color: aliceblue"
+            >Logout</a
+          >
+          <a
+            class="nav-item nav-link"
+            id="home"
+            href="/"
+            style="color: aliceblue"
+            >Home</a
+          >
+        </div>
+      </div>
+      <form class="form-inline my-2 my-lg-0">
+        <input
+          class="form-control mr-sm-2"
+          type="search"
+          placeholder="Pesquisar"
+          aria-label="Pesquisar"
+        />
+        <button
+          class="btn btn-outline-success my-2 my-sm-0"
+          type="submit"
+          style="color: rgb(0, 0, 0); background-color: aliceblue"
+        >
+          Pesquisar
+        </button>
+      </form>
+    </nav>
+    <div class="container">{% block content %} {% endblock %}</div>
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <!--Plugin jquery-->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <!--Plugin cloudflare-->
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+    <!--Plugin bootstrapcdn-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.js"></script>
+    <!--Plugin máscaras de dados-->
+
+    <!--Abaixo estão as Máscaras dos campos de input-->
+    <script>
+      $("#phone").mask("(00) 00000-0000");
+    </script>
+    <script>
+        $('#cpf').mask('000.000.000-00', {reverse: true});
+      </script>
+  </body>
+</html>
