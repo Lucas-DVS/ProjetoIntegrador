@@ -81,6 +81,29 @@
         </button>
       </form>
     </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} <!--Função para pegar todas as mensagens flash(função do flask) com categorização e apresentar -->
+    {% if messages %}                                                <!--na tela de sign_up -->
+      {% for category, message in messages%}
+      {% if category == 'error' %}
+      <div class="alert alert-danger alter-dismissable fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% else %}
+      <div class="alert alert-success alter-dismissable fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% endif %}
+      {% endfor %}
+    {% endif %}
+    {% endwith %}
+
     <div class="container">{% block content %} {% endblock %}</div>
     <script
       src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
@@ -103,12 +126,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.js"></script>
     <!--Plugin máscaras de dados-->
 
-    <!--Abaixo estão as Máscaras dos campos de input-->
+    <!--Abaixo estão as Máscaras dos campos de input do formulário sign_up-->
     <script>
       $("#phone").mask("(00) 00000-0000");
     </script>
     <script>
-        $('#cpf').mask('000.000.000-00', {reverse: true});
-      </script>
+      $("#cpf").mask("000.000.000-00", { reverse: true });
+    </script>
   </body>
 </html>
