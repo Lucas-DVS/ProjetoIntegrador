@@ -35,34 +35,13 @@
       </button>
       <div class="collapse navbar-collapse" id="navbar">
         <div class="navbar-nav">
-          <a
-            class="nav-item nav-link"
-            id="login"
-            href="/login"
-            style="color: aliceblue"
-            >Login</a
-          >
-          <a
-            class="nav-item nav-link"
-            id="signUp"
-            href="/sign-up"
-            style="color: aliceblue"
-            >Sign Up</a
-          >
-          <a
-            class="nav-item nav-link"
-            id="logout"
-            href="/logout"
-            style="color: aliceblue"
-            >Logout</a
-          >
-          <a
-            class="nav-item nav-link"
-            id="home"
-            href="/"
-            style="color: aliceblue"
-            >Home</a
-          >
+          {%if user.is_authenticated%} <!--Exibir apenas as paginas de home e logout se o usuário estiver logado-->
+          <a class="nav-item nav-link" id="home" href="/" style="color: aliceblue">Home</a>
+          <a class="nav-item nav-link" id="logout" href="/logout"  style="color: aliceblue">Logout</a>
+          {%else %} <!--Caso o usuário não esteja logado, exibir a pagina de login e sign-up-->
+          <a class="nav-item nav-link" id="login" href="/login" style="color: aliceblue">Login</a>
+          <a class="nav-item nav-link" id="signUp" href="/sign-up" style="color: aliceblue">Sign Up</a>
+          {% endif %}
         </div>
       </div>
       <form class="form-inline my-2 my-lg-0">
