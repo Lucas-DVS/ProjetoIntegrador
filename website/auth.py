@@ -3,6 +3,7 @@ from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user # objetos que contem as funções de validações de login e logout
+from .forms import addProducts
 
 auth = Blueprint('auth', __name__) #Aqui ficarão as blueprints que irão renderizar os templates. 
 
@@ -15,13 +16,13 @@ def login():
         user = User.query.filter_by(email=email).first() # procurando user na base de dados
         if user: # caso encontre o usuário
             if check_password_hash(user.password, password): # checar se as senhas estão iguais
-                flash('Logged in successfully!', category='success')
+                flash('Login efetuado com sucesso!', category='success')
                 login_user(user, remember=True) # Função que valida se o usuário está logado. 
                 return redirect(url_for('views.home'))
             else:
-                flash('Incorrect password, try again.', category='error')
+                flash('Senha incorreta, tente novamente', category='error')
         else:
-            flash('E-mail does not exist.', category='error') # Caso não encontre o usuário
+            flash('E-mail não encontrado', category='error') # Caso não encontre o usuário
 
     return render_template("login.html", user=current_user)
 
@@ -29,7 +30,8 @@ def login():
 @login_required # Decorador que só vai permitir acesso ao logout caso o usuário estiver logado. 
 def logout():
     logout_user() # função que irá deslogar o usuário que estiver logado na sessão
-    return redirect(url_for('auth.logout'))
+    flash('Logout efeutado com sucesso', category='sucess') #Mensagem de sucesso
+    return redirect(url_for('auth.login'))
 
 @auth.route('/sign-up', methods=['GET', 'POST']) # Obtendo dados do formulário. 
 def sign_up():
@@ -78,4 +80,10 @@ def sign_up():
 
     return render_template("sign_up.html", user=current_user)
 
+
+@auth.route('/addProduct', methods=['GET', 'POST'])
+@login_required # Decorador que só vai permitir acesso ao logout caso o usuário estiver logado.
+def addProduct():
+    form = addProducts(request.form)
+    return render_template("addProduct.html", user=current_user, form = form)
 

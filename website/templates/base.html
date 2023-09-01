@@ -14,7 +14,7 @@
       href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
       crossorigin="anonymous"
     />
-
+ 
     <title>{% block title %}Home{% endblock %}</title>
   </head>
 
@@ -35,9 +35,10 @@
       </button>
       <div class="collapse navbar-collapse" id="navbar">
         <div class="navbar-nav">
-          {%if user.is_authenticated%} <!--Exibir apenas as paginas de home e logout se o usuário estiver logado-->
+          {%if user.is_authenticated%} <!--Exibir apenas as paginas abaixo se o usuário estiver logado-->
           <a class="nav-item nav-link" id="home" href="/" style="color: aliceblue">Home</a>
-          <a class="nav-item nav-link" id="logout" href="/logout"  style="color: aliceblue">Logout</a>
+          <a class="nav-item nav-link" id="addProduct" href="/addProduct"  style="color: aliceblue">Adicionar produto</a>
+          <a class="nav-item nav-link" id="logout" href="/logout"  style="color: aliceblue" data-toggle="modal" data-target="#modalExemplo">Logout</a>
           {%else %} <!--Caso o usuário não esteja logado, exibir a pagina de login e sign-up-->
           <a class="nav-item nav-link" id="login" href="/login" style="color: aliceblue">Login</a>
           <a class="nav-item nav-link" id="signUp" href="/sign-up" style="color: aliceblue">Sign Up</a>
@@ -45,24 +46,36 @@
         </div>
       </div>
       <form class="form-inline my-2 my-lg-0">
-        <input
-          class="form-control mr-sm-2"
-          type="search"
-          placeholder="Pesquisar"
-          aria-label="Pesquisar"
-        />
-        <button
-          class="btn btn-outline-success my-2 my-sm-0"
-          type="submit"
-          style="color: rgb(0, 0, 0); background-color: aliceblue"
-        >
-          Pesquisar
-        </button>
+        {%if user.is_authenticated%} <!--Exibir a função abaixo apenas se o usuário estiver logado-->
+        <input class="form-control mr-sm-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar"/>
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" style="color: rgb(0, 0, 0); background-color: aliceblue">Pesquisar</button>
+        {% endif %}
       </form>
     </nav>
 
-    {% with messages = get_flashed_messages(with_categories=true) %} <!--Função para pegar todas as mensagens flash(função do flask) com categorização e apresentar -->
-    {% if messages %}                                                <!--na tela de sign_up -->
+      <!-- Modal para confirmar a ação de deslogar -->
+      <div class="modal fade" id="modalExemplo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Logout</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body text-center">
+              <div class="mt-3" style="height: 50px; font-size:larger">Tem certeza que deseja sair?</div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancelar</button>
+              <a href="logout" type="button" class="btn btn-outline-danger btn-sm">Confirmar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} <!--Função para pegar todas as mensagens flash(função do flask) com categorização e apresentar através de alertas-->
+    {% if messages %}                                               
       {% for category, message in messages%}
       {% if category == 'error' %}
       <div class="alert alert-danger alter-dismissable fade show" role="alert">
