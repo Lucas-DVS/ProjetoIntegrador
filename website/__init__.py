@@ -2,15 +2,25 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
+from flask_uploads import IMAGES, UploadSet, configure_uploads # Realizar o upload das imagens enviadas na pagina adicionar produtos
+import os # Realizar o upload das imagens enviadas na pagina adicionar produtos
+
 
 db = SQLAlchemy() #instanciação do SQLAchemy
 DB_NAME = "database.db" #localização do data base
 
+photos = UploadSet('photos', IMAGES) # Realizar o upload das imagens enviadas na pagina adicionar produtos
+
+
 def create_app(): #Fábricas Básicas flask
+    basedir = os.path.abspath(os.path.dirname(__file__)) # Realizar o upload das imagens enviadas na pagina adicionar produtos
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'QWERTY'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}' # Informando a localização do database
     db.init_app(app) #Iniciando o database
+    app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(basedir, 'static/images') # Realizar o upload das imagens enviadas na pagina adicionar produtos
+
+    configure_uploads(app, photos) # Realizar o upload das imagens enviadas na pagina adicionar produtos
 
     from .views import views
     from .auth import auth

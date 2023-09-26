@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from .models import User
+from .models import User, Product
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import db
+from . import db, photos 
 from flask_login import login_user, login_required, logout_user, current_user # objetos que contem as funções de validações de login e logout
 from .forms import addProducts
+import secrets
 
 auth = Blueprint('auth', __name__) #Aqui ficarão as blueprints que irão renderizar os templates. 
 
@@ -48,35 +49,33 @@ def sign_up():
         user = User.query.filter_by(email=email).first() #validando se o e-mail já existe
         user_CPF = User.query.filter_by(cpf=cpf).first() #validando se o cpf já existe
         if user:
-            flash('E-mail already exist.', category='error')
+            flash('E-mail já existente.', category='error')
         elif user_CPF:
-            flash('CPF already exist', category='error')
+            flash('CPF já existente', category='error')
         elif len(firstName) < 2:
-            flash('First name must be more than one caracters', category='error')
+            flash('O primeiro nome deve conter mais de um caractere', category='error')
         elif len(cpf) < 11:
-            flash('CPF invalid', category='error')
+            flash('CPF invalido', category='error')
         elif password1 != password2:
-            flash('Passwords don\'t match', category='error') # Function to validate the password <<
+            flash('Senhas não são iguais', category='error') # Function to validate the password <<
         elif len(password1) < 7:
-            flash('Password should be at least 7 characters', category='error') 
+            flash('Senha deve conter ao menos 7 caracteres', category='error') 
         elif len(password1) > 20:
-            flash('Password should be not be greater than 20', category='error')
+            flash('Senha não pode ter mais que 20 caracteres', category='error')
         elif not any(char.isdigit() for char in password1):
-            flash('Password should have at least one numeral', category='error')
+            flash('Senha deve ter ao menos um numeral', category='error')
         elif not any(char.isupper() for char in password1):
-            flash('Password should have at least one uppercase letter', category='error')
+            flash('Senha deve ter ao menos uma letra maiúsculas', category='error')
         elif not any(char.islower() for char in password1):
-            flash('Password should have at least one lowercase letter', category='error')
+            flash('Senha deve ter ao menos uma letra minúsculas', category='error')
         elif not any(char in SpecialSym for char in password1):
-            flash('Password should have at least one of the symbols $@#', category='error') # Function to validate the password >>
+            flash('Senha deve conter um desses símbolos: $@#', category='error') # Function to validate the password >>
         else:
             new_user = User(firstName=firstName, cpf=cpf, phone=phone, email=email, password=generate_password_hash(password1, method='sha256'))
             db.session.add(new_user) #Adicionando novo usuário no banco de dados
             db.session.commit() #efetuando commit
-            login_user(user, remember=True)
             flash('Account created!', category='sucess') #Mensagem de sucesso
-            return redirect(url_for('views.home')) # Redirecionando usuário para a homepage
-
+            return redirect(url_for('auth.login')) # Redirecionando usuário para a login page
 
     return render_template("sign_up.html", user=current_user)
 
@@ -85,5 +84,19 @@ def sign_up():
 @login_required # Decorador que só vai permitir acesso ao logout caso o usuário estiver logado.
 def addProduct():
     form = addProducts(request.form)
+    if request.method == 'POST':
+        name = form.name.data # pegando os dados da variavel form acima
+        price = form.price.data # pegando os dados da variavel form acima
+        discount = form.discount.data # pegando os dados da variavel form acima
+        stock = form.stock.data # pegando os dados da variavel form acima
+        description = form.description.data # pegando os dados da variavel form acima
+        img = photos.save(request.files.get('image'), name=secrets.token_hex(10) + ".") # Realizar o upload das imagens enviadas na pagina adicionar produtos
+
+        new_product = Product(name=name, price=price, discount=discount, stock=stock, description=description, user_id=current_user.id, img=img)
+        db.session.add(new_product)
+        flash(f'O produto {name} foi adicionado com sucesso ao sistema', category='sucess')
+        db.session.commit()
+        
     return render_template("addProduct.html", user=current_user, form = form)
+
 

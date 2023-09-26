@@ -11,12 +11,12 @@
         {% from "_formhelpers.html" import render_field %}
         <form action="" method="POST" enctype="multipart/form-data">
             {{render_field(form.name, class="form-control", placeholder="Adicione o nome do produto")}}
-            {{render_field(form.price, class="form-control", placeholder="Adicione o preço do produto")}}
+            {{render_field(form.price, class="form-control", id="price", placeholder="Adicione o preço do produto")}}
             {{render_field(form.discount, class="form-control", placeholder="Adicione o desconto do produto")}}
             {{render_field(form.stock, class="form-control", placeholder="Adicione a quantidade em estoque")}}
             {{render_field(form.description, class="form-control", placeholder="Adicione a descrição do produto", rows="10")}}
 
-            <div class="container">
+            <div class="center">
                 <div class="row">
                     <div class="col-md-4">{{ render_field(form.image, class="form-control")}}</div>
                 </div>

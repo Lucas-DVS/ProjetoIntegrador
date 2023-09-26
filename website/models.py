@@ -1,6 +1,7 @@
 from . import db #importando o objeto instaciado no init
 from flask_login import UserMixin # Modelo do flask que ajuda no login de usuários. 
 from sqlalchemy.sql import func
+from datetime import date, time, datetime, timedelta
 import json
 
 class User(db.Model, UserMixin):
@@ -14,11 +15,14 @@ class User(db.Model, UserMixin):
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    img = db.Column(db.LargeBinary)
-    name = db.Column(db.String(100))
-    price = db.Column(db.Float(15))
-    text = db.Column(db.String(200))
+    name = db.Column(db.String(80), nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    discount = db.Column(db.Integer, default=0)
+    stock = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.String(200), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    pub_date = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    img = db.Column(db.String(150), nullable=False, default='image.jpg')
 
 
 class JsonEcodeDict(db.TypeDecorator): # Classe para pegar uma lista com os pedidos. 
