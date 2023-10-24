@@ -105,7 +105,7 @@ def stock():
     products = Product.query.all() # Buscando todos os itens da tabela Product nos models e colocando dentro da variavel products
     return render_template("stock.html", user=current_user, products=products) # Passando a variavel Products com todos os itens da tabela para a pagina stock
 
-@auth.route('/updateproduct/<int:id>', methods=['GET', 'POST']) # URL do updateproduct
+@auth.route('/updateproduct/<int:id>', methods=['GET', 'POST']) # URL do updateproduct - Função para atualizar os produtos
 def updateProduct(id):
     product = Product.query.get_or_404(id) # pegando os dados do produto no database pelo ID 
     form = addProducts(request.form)
@@ -136,7 +136,7 @@ def updateProduct(id):
 
     return render_template("updateProduct.html", user=current_user, form=form, product=product)
 
-@auth.route('/deleteProduct/<int:id>', methods=['POST']) # URL do deleteproduct
+@auth.route('/deleteProduct/<int:id>', methods=['POST']) # URL do deleteproduct - Função para deletar os produtos
 def deleteProduct(id):
 
     product = Product.query.get_or_404(id) # pegando os dados do produto no database pelo ID
