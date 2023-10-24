@@ -38,6 +38,7 @@
           {%if user.is_authenticated%} <!--Exibir apenas as paginas abaixo se o usuário estiver logado-->
           <a class="nav-item nav-link" id="home" href="/" style="color: aliceblue">Home</a>
           <a class="nav-item nav-link" id="addProduct" href="/addProduct"  style="color: aliceblue">Adicionar produto</a>
+          <a class="nav-item nav-link" id="stock" href="/stock"  style="color: aliceblue">Estoque</a>
           <a class="nav-item nav-link" id="logout" href="/logout"  style="color: aliceblue" data-toggle="modal" data-target="#modalExemplo">Logout</a>
           {%else %} <!--Caso o usuário não esteja logado, exibir a pagina de login e sign-up-->
           <a class="nav-item nav-link" id="login" href="/login" style="color: aliceblue">Login</a>

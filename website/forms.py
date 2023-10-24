@@ -9,4 +9,4 @@ class addProducts(Form): #formulario para adicionar produtos
     stock = IntegerField('Estoque', [validators.DataRequired()])
     description = TextAreaField('Descrição', [validators.DataRequired()])
 
-    image = FileField('Imagem', validators=[FileRequired(), FileAllowed(['jpg','png','gif','jpeg'])])
+    image = FileField('Imagem', validators=[FileAllowed(['jpg','png','gif','jpeg'])])

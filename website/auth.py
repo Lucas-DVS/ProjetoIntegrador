@@ -1,10 +1,10 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session, current_app
 from .models import User, Product
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db, photos 
 from flask_login import login_user, login_required, logout_user, current_user # objetos que contem as funções de validações de login e logout
 from .forms import addProducts
-import secrets
+import secrets, os
 
 auth = Blueprint('auth', __name__) #Aqui ficarão as blueprints que irão renderizar os templates. 
 
@@ -80,7 +80,7 @@ def sign_up():
     return render_template("sign_up.html", user=current_user)
 
 
-@auth.route('/addProduct', methods=['GET', 'POST'])
+@auth.route('/addProduct', methods=['GET', 'POST']) # URL adicionar produto
 @login_required # Decorador que só vai permitir acesso ao logout caso o usuário estiver logado.
 def addProduct():
     form = addProducts(request.form)
@@ -98,5 +98,58 @@ def addProduct():
         db.session.commit()
         
     return render_template("addProduct.html", user=current_user, form = form)
+
+@auth.route('/stock', methods=['GET', 'POST']) # URL do estoque
+@login_required # Decorador que só vai permitir acesso ao logout caso o usuário estiver logado.
+def stock():
+    products = Product.query.all() # Buscando todos os itens da tabela Product nos models e colocando dentro da variavel products
+    return render_template("stock.html", user=current_user, products=products) # Passando a variavel Products com todos os itens da tabela para a pagina stock
+
+@auth.route('/updateproduct/<int:id>', methods=['GET', 'POST']) # URL do updateproduct
+def updateProduct(id):
+    product = Product.query.get_or_404(id) # pegando os dados do produto no database pelo ID 
+    form = addProducts(request.form)
+
+    #Alterando o banco de dados com as informações inseridas no formulário
+    if request.method == "POST":
+        product.name = form.name.data
+        product.price = form.price.data
+        product.discount = form.discount.data
+        product.stock = form.stock.data
+        product.description = form.description.data
+        if request.files.get('image'):
+            try:
+                os.unlink(os.path.join(current_app.root_path, "static/images/" + product.img))
+                product.img = photos.save(request.files.get('image'), name=secrets.token_hex(10) + ".") # Realizar o upload das imagens enviadas na pagina adicionar produtos
+            except:
+                product.img = photos.save(request.files.get('image'), name=secrets.token_hex(10) + ".") # Realizar o upload das imagens enviadas na pagina adicionar produtos
+        db.session.commit()
+        flash(f'Seu produto foi atulizado', 'sucess')
+        return redirect(url_for('auth.stock')) # Redirecionando usuário para a login page
+    
+    # Preenchendo os campos com os dados que foram recuparados do banco de dados. 
+    form.name.data = product.name
+    form.price.data = product.price
+    form.discount.data = product.discount
+    form.stock.data = product.stock
+    form.description.data = product.description
+
+    return render_template("updateProduct.html", user=current_user, form=form, product=product)
+
+@auth.route('/deleteProduct/<int:id>', methods=['POST']) # URL do deleteproduct
+def deleteProduct(id):
+
+    product = Product.query.get_or_404(id) # pegando os dados do produto no database pelo ID
+    if request.method == "POST":
+            try:
+                os.unlink(os.path.join(current_app.root_path, "static/images/" + product.img))
+            except Exception as e:
+                print(e)
+            db.session.delete(product)
+            db.session.commit()
+            flash(f'O produto {product.name} foi deletado do seu estoque', 'sucess')
+            return redirect(url_for('auth.stock')) # Redirecionando usuário para a login page
+    flash(f'Não foi possível deletar o produto', 'danger')
+    return redirect(url_for('auth.stock'))
 
 
