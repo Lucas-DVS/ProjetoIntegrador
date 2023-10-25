@@ -8,6 +8,13 @@ import secrets, os
 
 auth = Blueprint('auth', __name__) #Aqui ficarão as blueprints que irão renderizar os templates. 
 
+@auth.route('/home')
+def home():
+    page = request.args.get('page',1, type=int)
+    products = Product.query.filter(Product.stock > 0).order_by(
+        Product.id.desc()).paginate(page=page, per_page= 8) # Buscar os produtos(Product) que estão na base de dados, ordena por ID e define a quantidade de produtos por pagina
+    return render_template('home.html', user=current_user, products = products) # Colocar a relação de produtos(Product) encontrados na variavel products para enviar ao home.html
+
 @auth.route('/login', methods=['GET', 'POST']) 
 def login():
     if request.method =='POST':
