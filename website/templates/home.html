@@ -6,24 +6,24 @@
         {% for product in products.items %} <!-- Percorrer os dados da variavel products enviados pelo auth.py-->
         <div class="col-md-3 mt-3">
             <div class="card bg-light mb-3" style="max-width: 18rem; border-radius: 15px;"> <!-- bootstrap - Exibição do card-->
-                    <img src="{{url_for('static', filename='images/' + product.img)}}" alt="product.name" class="card-img-top" height="200" style="border-radius: 15px;">
+                <img src="{{url_for('static', filename='images/' + product.img)}}" alt="product.name" class="card-img-top" height="200" style="border-radius: 15px;">
                 <div class="card-body"> <!-- bootstrap - conteudo card-->
-                        {% if product.discount > 0 %}
-                        <h5 style="text-shadow: 2px 2px 3px #000000; color: #F00; transform: rotate(-15deg); position:absolute; top:20%; 
-                        left: 20%;"> Desconto: {{product.discount}}%</h5>
-                        {% endif %}
+                    {% if product.discount > 0 %}
+                     <h5 style="text-shadow: 2px 2px 3px #000000; color: #F00; transform: rotate(-15deg); position:absolute; top:20%; left: 20%;"> Desconto: {{product.discount}}%</h5>
+                    {% endif %}
                     <h5 class="text-center">{{product.name}}</h5>
                     <p class="text-center">Preço R${{product.price}}</p>
                 </div>
                 <div class="card-footer" style="border-radius: 15px;"> <!-- bootstrap - rodapé card-->
-                    <a href="#" class="float-left btn btn-sm btn-primary" style="border-radius: 10px;">Detalhes</a> 
+                    <a href="{{url_for('auth.single_page', id= product.id)}}" class="float-left btn btn-sm btn-primary" style="border-radius: 10px;">Detalhes</a> 
                     <a href="#" class="float-right btn btn-sm btn-warning" style="border-radius: 10px;">Comprar</a>
                 </div>
             </div>
         </div>
         {% endfor %}
-    </div>
-    <!-- Abaixo está o codigo para organizar e controlar a navegação entre as paginas -->
+    </div> <!-- Abaixo está o codigo para organizar e controlar a navegação entre as paginas -->
+    
+    
     <div class="row">
         <div class="col text-center">
             {% if products.has_prev %}
@@ -50,4 +50,4 @@
     </div>
 </div>
 
-{% endblock %}
+{% endblock%}

@@ -8,12 +8,17 @@ import secrets, os
 
 auth = Blueprint('auth', __name__) #Aqui ficarão as blueprints que irão renderizar os templates. 
 
-@auth.route('/home')
+@auth.route('/')
 def home():
     page = request.args.get('page',1, type=int)
     products = Product.query.filter(Product.stock > 0).order_by(
-        Product.id.desc()).paginate(page=page, per_page= 8) # Buscar os produtos(Product) que estão na base de dados, ordena por ID e define a quantidade de produtos por pagina
+        Product.id.desc()).paginate(page=page, per_page= 2) # Buscar os produtos(Product) que estão na base de dados, ordena por ID e define a quantidade de produtos por pagina
     return render_template('home.html', user=current_user, products = products) # Colocar a relação de produtos(Product) encontrados na variavel products para enviar ao home.html
+
+@auth.route('/single_page/<int:id>')
+def single_page(id):
+    product = Product.query.get_or_404(id)
+    return render_template('single_page.html', user=current_user, product = product)
 
 @auth.route('/login', methods=['GET', 'POST']) 
 def login():
@@ -26,7 +31,7 @@ def login():
             if check_password_hash(user.password, password): # checar se as senhas estão iguais
                 flash('Login efetuado com sucesso!', category='success')
                 login_user(user, remember=True) # Função que valida se o usuário está logado. 
-                return redirect(url_for('views.home'))
+                return redirect(url_for('auth.home'))
             else:
                 flash('Senha incorreta, tente novamente', category='error')
         else:

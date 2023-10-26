@@ -14,14 +14,16 @@
       href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
       crossorigin="anonymous"
     />
+
+    <title>{% block title %}Home{% endblock %}</title>
+
     <!--Cor do fundo -->
     <style> 
         body{
           background-color: #fffbfb;
         }
     </style>
- 
-    <title>{% block title %}Home{% endblock %}</title>
+    
   </head>
 
   <body>
@@ -42,7 +44,7 @@
       <div class="collapse navbar-collapse" id="navbar">
         <div class="navbar-nav">
           {%if user.is_authenticated%} <!--Exibir apenas as paginas abaixo se o usuário estiver logado-->
-          <a class="nav-item nav-link" id="home" href="/home" style="color: aliceblue">Home</a>
+          <a class="nav-item nav-link" id="home" href="/" style="color: aliceblue">Home</a>
           <a class="nav-item nav-link" id="addProduct" href="/addProduct"  style="color: aliceblue">Adicionar produto</a>
           <a class="nav-item nav-link" id="stock" href="/stock"  style="color: aliceblue">Estoque</a>
           <a class="nav-item nav-link" id="logout" href="/logout"  style="color: aliceblue" data-toggle="modal" data-target="#modalExemplo">Logout</a>
