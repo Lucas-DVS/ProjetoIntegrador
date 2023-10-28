@@ -16,7 +16,12 @@
                 </div>
                 <div class="card-footer" style="border-radius: 15px;"> <!-- bootstrap - rodapé card-->
                     <a href="{{url_for('auth.single_page', id= product.id)}}" class="float-left btn btn-sm btn-primary" style="border-radius: 10px;">Detalhes</a> 
-                    <a href="#" class="float-right btn btn-sm btn-warning" style="border-radius: 10px;">Comprar</a>
+                    <form action="{{url_for('auth.AddCart')}}" method="post">
+                        <input type="hidden" name="product_id" value="{{product.id}}">
+                        <button type="submit" class="btn btn-sm btn-warning float-right" style="border-radius: 10px;"> Comprar </button>
+                        <input type="hidden" name="quantity" id="" value="1" min="1" max="{{product.stock}}">
+                        </select>
+                    </form>
                 </div>
             </div>
         </div>

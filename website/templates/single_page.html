@@ -13,10 +13,17 @@
             {% if product.discount > 0 %}
             <p> Desconto: {{ product.discount }}%</p>
             {% endif %}
+            <hr>
             <b>Descrição</b>
             <p>{{product.description}}</p>
-            <a href="" class="btn btn-warning">Comprar</a>
-
+            <hr>
+            <form action="{{url_for('auth.AddCart')}}" method="post">
+                <input type="hidden" name="product_id" value="{{product.id}}">
+                <button type="submit" class="btn btn-sm btn-warning"> Adicionar ao carrinho  </button>
+                <label for=""> Quantidade: </label>
+                <input type="number" name="quantity" id="" value="1" min="1" max="{{product.stock}}">
+                </select>
+            </form>
         </div>
     </div>
 </div>

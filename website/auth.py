@@ -164,4 +164,35 @@ def deleteProduct(id):
     flash(f'Não foi possível deletar o produto', 'danger')
     return redirect(url_for('auth.stock'))
 
+def MargerDicts(dict1, dict2):
+    if isinstance(dict1, list) and isinstance(dict2, list):
+        return dict1 + dict1
+    elif isinstance(dict1, dict) and isinstance(dict2, dict):
+        return dict(list(dict1.items()) + list(dict2.items()))
+    return False
 
+
+@auth.route('/addcart', methods=['POST']) # adicionando itens no carrinho
+def AddCart():
+    try:
+        product_id = request.form.get('product_id')
+        quantity = request.form.get('quantity')
+        product = Product.query.filter_by(id=product_id).first()
+        if product_id and quantity and request.method == "POST":
+            DicItems = {product_id:{'name': product.name, 'price':product.price, 'discount': product.discount, 'quantity': product.stock, 'image': product.img}}
+
+            if 'Shoppingcart' in session:
+                print(session['Shoppingcart'])
+                if product_id in session['Shoppingcart']:
+                    print("Esse item já está no seu carrinho")
+                else:
+                    session['Shoppingcart'] = MargerDicts(session['Shoppingcart'], DicItems)
+                    return redirect(request.referrer)
+            else:
+                session['Shoppingcart'] = DicItems
+                return redirect(request.referrer)
+            
+    except Exception as e:
+        print(e)
+    finally:
+        return redirect(request.referrer)

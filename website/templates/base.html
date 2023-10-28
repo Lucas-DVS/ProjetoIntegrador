@@ -48,12 +48,18 @@
           <a class="nav-item nav-link" id="addProduct" href="/addProduct"  style="color: aliceblue">Adicionar produto</a>
           <a class="nav-item nav-link" id="stock" href="/stock"  style="color: aliceblue">Estoque</a>
           <a class="nav-item nav-link" id="logout" href="/logout"  style="color: aliceblue" data-toggle="modal" data-target="#modalExemplo">Logout</a>
+          <li class="nav-item">
+            <a class="nav-link disable" href="#" tabindex="-1">Carrinho({{session['Shoppingcart']|length}})</a>
+          </li>
           {%else %} <!--Caso o usuário não esteja logado, exibir a pagina de login e sign-up-->
           <a class="nav-item nav-link" id="login" href="/login" style="color: aliceblue">Login</a>
           <a class="nav-item nav-link" id="signUp" href="/sign-up" style="color: aliceblue">Sign Up</a>
           {% endif %}
         </div>
       </div>
+
+
+
       <form class="form-inline my-2 my-lg-0">
         {%if user.is_authenticated%} <!--Exibir a função abaixo apenas se o usuário estiver logado-->
         <input class="form-control mr-sm-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar"/>
