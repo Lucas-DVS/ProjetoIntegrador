@@ -12,7 +12,7 @@ auth = Blueprint('auth', __name__) #Aqui ficarão as blueprints que irão render
 def home():
     page = request.args.get('page',1, type=int)
     products = Product.query.filter(Product.stock > 0).order_by(
-        Product.id.desc()).paginate(page=page, per_page= 2) # Buscar os produtos(Product) que estão na base de dados, ordena por ID e define a quantidade de produtos por pagina
+        Product.id.desc()).paginate(page=page, per_page= 8) # Buscar os produtos(Product) que estão na base de dados, ordena por ID e define a quantidade de produtos por pagina
     return render_template('home.html', user=current_user, products = products) # Colocar a relação de produtos(Product) encontrados na variavel products para enviar ao home.html
 
 @auth.route('/single_page/<int:id>')
@@ -179,7 +179,7 @@ def AddCart():
         quantity = request.form.get('quantity')
         product = Product.query.filter_by(id=product_id).first()
         if product_id and quantity and request.method == "POST":
-            DicItems = {product_id:{'name': product.name, 'price':product.price, 'discount': product.discount, 'quantity': product.stock, 'image': product.img}}
+            DicItems = {product_id:{'name': product.name, 'price':product.price, 'discount': product.discount, 'quantity': quantity, 'image': product.img}}
 
             if 'Shoppingcart' in session:
                 print(session['Shoppingcart'])
@@ -196,3 +196,51 @@ def AddCart():
         print(e)
     finally:
         return redirect(request.referrer)
+    
+@auth.route('/carts') # Acessando o carrinho
+def getCart():
+    if 'Shoppingcart' not in session or len(session['Shoppingcart'])<= 0:
+        return redirect(url_for('auth.home'))
+    subtotal = 0
+    total = 0
+    for key, product in session['Shoppingcart'].items(): 
+        subtotal += float(product['price']) * int(product['quantity'])
+        discount = subtotal * (product['discount']/100)
+        subtotal -= discount
+        total += float("%.2f" % (subtotal))
+        discount = 0
+        subtotal = 0
+
+    return render_template('carts.html', user=current_user, total = total)
+
+@auth.route('/updatecart/<int:code>', methods=['POST']) # Editando itens do carrinho
+def updatecart(code):
+    if 'Shoppingcart' not in session or len(session['Shoppingcart']) <= 0:
+        return redirect(url_for('auth.home'))
+    if request.method == "POST":
+        quantity = request.form.get('quantity')
+        try:
+            session.modified = True
+            for key, item in session['Shoppingcart'].items():
+                if int(key) == code:
+                    item['quantity'] = quantity
+                    flash('O item foi atualizado!')
+                    return redirect(url_for('auth.getCart'))
+        except Exception as e:
+            print(e)
+            return redirect(url_for('auth.getCart'))
+        
+
+@auth.route('/deleteitem/<int:id>') # Excluindo itens do carrinho
+def deleteitem(id):
+    if 'Shoppingcart' not in session or len(session['Shoppingcart']) <= 0:
+        return redirect(url_for('/'))
+    try:
+        session.modified = True
+        for key, item in session['Shoppingcart'].items():
+            if int(key) == id:
+                session['Shoppingcart'].pop(key, None)
+                return redirect(url_for('auth.getCart'))
+    except Exception as e:
+        print(e)
+        return redirect(url_for('auth.getCart'))

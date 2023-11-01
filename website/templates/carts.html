@@ -1,0 +1,56 @@
+{% extends "base.html" %} {% block title %}Carrinho{% endblock %} {% block content%}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+        <table class="table table-sm">
+            <thead>
+                <th>ID</th>
+                <th>Imagem</th>
+                <th>Nome</th>
+                <th>Preço</th>
+                <th>Quantidade</th>
+                <th>Desconto</th>
+                <th>Subtotal</th>
+                <th>Editar</th>
+                <th>Remover</th>
+            </thead>
+            <tbody>
+                {% for key, product in session['Shoppingcart'].items() %}
+                {% set discount = product.discount/100 %}
+                
+                <tr>
+                    <td>{{loop.index}}</td>
+                    <td><img src="{{url_for('static', filename='images/'+ product.image)}}" alt="{{product.name}}" width="50" height="45"></td>
+                    <td>{{product.name}}</td>
+                    <form action="{{url_for('auth.updatecart', code=key)}}" method="post">
+                    <td>R${{product.price}}</td>
+                    <td><input type="number" name="quantity" min="1" max="10" value="{{product.quantity}}"></td>
+                    {% if product.discount > 0 %}
+                    <td>{{product.discount}}%</td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
+                    {% set subtotal = product.quantity|int * product.price|float %}
+                    <td>R${{"%0.2f"|format((subtotal|float) - (subtotal|float * discount|float))}}</td>
+                    <td><button type="submit" class="btn btn-sm btn-info">Editar</button></td>
+                </form>
+                    <td><a href="{{url_for('auth.deleteitem', id=key)}}" class="btn btn-sm btn-danger">Remover</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <table class="table table-sm">
+            <tr>
+                <td><a href="/" class="btn btn-outline-info">Continuar comprando</a></td>
+                <td witdh="30%"></td>
+                <td><h5></h5></td>
+                <td><h5>Total: R${{total}}</h5></td>
+            </tr>
+        </table>
+      </div>
+   </div>
+</div>
+
+{% endblock %}
+
