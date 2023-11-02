@@ -4,10 +4,13 @@ from os import path
 from flask_login import LoginManager
 from flask_uploads import IMAGES, UploadSet, configure_uploads # Realizar o upload das imagens enviadas na pagina adicionar produtos
 import os # Realizar o upload das imagens enviadas na pagina adicionar produtos
+from flask_msearch import Search
 
 
 db = SQLAlchemy() #instanciação do SQLAchemy
 DB_NAME = "database.db" #localização do data base
+search = Search()
+
 
 photos = UploadSet('photos', IMAGES) # Realizar o upload das imagens enviadas na pagina adicionar produtos
 
@@ -19,6 +22,7 @@ def create_app(): #Fábricas Básicas flask
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}' # Informando a localização do database
     db.init_app(app) #Iniciando o database
     app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(basedir, 'static/images') # Realizar o upload das imagens enviadas na pagina adicionar produtos
+    search.init_app(app)
 
     configure_uploads(app, photos) # Realizar o upload das imagens enviadas na pagina adicionar produtos
 

@@ -1,19 +1,26 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session, current_app
 from .models import User, Product
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import db, photos 
+from . import db, photos, search
 from flask_login import login_user, login_required, logout_user, current_user # objetos que contem as funções de validações de login e logout
 from .forms import addProducts
 import secrets, os
 
 auth = Blueprint('auth', __name__) #Aqui ficarão as blueprints que irão renderizar os templates. 
 
-@auth.route('/')
+@auth.route('/') #Home
 def home():
     page = request.args.get('page',1, type=int)
     products = Product.query.filter(Product.stock > 0).order_by(
         Product.id.desc()).paginate(page=page, per_page= 8) # Buscar os produtos(Product) que estão na base de dados, ordena por ID e define a quantidade de produtos por pagina
     return render_template('home.html', user=current_user, products = products) # Colocar a relação de produtos(Product) encontrados na variavel products para enviar ao home.html
+
+
+@auth.route('/result') # Pesquisa
+def result():
+    searchword = request.args.get('q')
+    products = Product.query.msearch(searchword, fields=['name', 'description'], limit=15)
+    return render_template('result.html', user=current_user, products = products)
 
 @auth.route('/single_page/<int:id>')
 def single_page(id):
@@ -176,15 +183,18 @@ def MargerDicts(dict1, dict2):
 def AddCart():
     try:
         product_id = request.form.get('product_id')
-        quantity = request.form.get('quantity')
+        quantity = int(request.form.get('quantity'))
         product = Product.query.filter_by(id=product_id).first()
+        
         if product_id and quantity and request.method == "POST":
             DicItems = {product_id:{'name': product.name, 'price':product.price, 'discount': product.discount, 'quantity': quantity, 'image': product.img}}
-
             if 'Shoppingcart' in session:
                 print(session['Shoppingcart'])
                 if product_id in session['Shoppingcart']:
-                    print("Esse item já está no seu carrinho")
+                    for key, item in session['Shoppingcart'].items():
+                        if int(key) == int(product_id):
+                            session.modified = True
+                            item['quantity'] += 1
                 else:
                     session['Shoppingcart'] = MargerDicts(session['Shoppingcart'], DicItems)
                     return redirect(request.referrer)
@@ -244,3 +254,12 @@ def deleteitem(id):
     except Exception as e:
         print(e)
         return redirect(url_for('auth.getCart'))
+    
+
+@auth.route('/clearcart')
+def clearcart():
+    try:
+        session.pop('Shoppingcart', None)
+        return redirect(url_for('auth.home'))
+    except Exception as e:
+        print(e)

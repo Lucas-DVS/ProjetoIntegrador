@@ -42,10 +42,9 @@
         </table>
         <table class="table table-sm">
             <tr>
-                <td><a href="/" class="btn btn-outline-info">Continuar comprando</a></td>
-                <td witdh="30%"></td>
-                <td><h5></h5></td>
+                <td><a href="/" class="btn btn-success">Continuar comprando</a></td>
                 <td><h5>Total: R${{total}}</h5></td>
+                <td><a href="{{url_for('auth.clearcart')}}" class="btn btn-danger btn-sm float-right mr-5">Limpar carrinho</a></td>
             </tr>
         </table>
       </div>

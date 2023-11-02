@@ -14,6 +14,7 @@ class User(db.Model, UserMixin):
     notes = db.relationship('Order')
 
 class Product(db.Model):
+    __seachbale__ = ['name', 'description'] # Itens que poderão ser pesquisados pelo flask_msearch
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     price = db.Column(db.Float, nullable=False)

@@ -26,10 +26,10 @@
             </div>
         </div>
         {% endfor %}
-    </div> <!-- Abaixo está o codigo para organizar e controlar a navegação entre as paginas -->
+    </div> 
     
     
-    <div class="row">
+    <div class="row"> <!-- Codigo para organizar e controlar a navegação entre as paginas -->
         <div class="col text-center">
             {% if products.has_prev %}
             <a href="{{url_for('auth.home', page=products.prev_num)}}" class="btn btn-outline-info btn-sm mt-3">Anterior</a>
@@ -54,5 +54,13 @@
         </div>
     </div>
 </div>
+
+<br />
+
+<footer class="text-light">
+    <div class="text-center" style="background-color: #d85372; padding: 20px;" >
+      &copy 2023 Copyright: <a href="#" style="color: aliceblue;">Cupcakes Gourmet</a>
+    </div>
+</footer>
 
 {% endblock%}

@@ -1,5 +1,5 @@
 from flask_wtf.file import FileAllowed, FileField, FileRequired
-from wtforms import Form, IntegerField, StringField, BooleanField, TextAreaField, validators, FloatField
+from wtforms import Form, IntegerField, StringField, BooleanField, TextAreaField, validators, FloatField, PasswordField, SubmitField
 
 class addProducts(Form): #formulario para adicionar produtos
     
@@ -10,3 +10,4 @@ class addProducts(Form): #formulario para adicionar produtos
     description = TextAreaField('Descrição', [validators.DataRequired()])
 
     image = FileField('Imagem', validators=[FileAllowed(['jpg','png','gif','jpeg'])])
+
