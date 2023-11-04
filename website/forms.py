@@ -11,3 +11,10 @@ class addProducts(Form): #formulario para adicionar produtos
 
     image = FileField('Imagem', validators=[FileAllowed(['jpg','png','gif','jpeg'])])
 
+class attUser(Form): #formulario para atualizar usuário
+    
+    firstName = StringField('Nome', [validators.DataRequired()])
+    cpf = FloatField('CPF', [validators.DataRequired()])
+    phone = FloatField('Telefone', [validators.DataRequired()])
+    email = StringField('email', [validators.DataRequired()])
+    password = StringField('senha', [validators.DataRequired()])

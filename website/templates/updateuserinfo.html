@@ -1,0 +1,28 @@
+{% extends "base.html" %} {% block title %}Dados do usuário{% endblock %} 
+{% block content%}
+
+<div class="container">
+    <br />
+    <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <h2 class="text-center">Dados do usuário</h2>
+        {% from "_formhelpers.html" import render_field %}
+        <form action="" method="POST" enctype="multipart/form-data">
+            {{render_field(form.firstName, class="form-control", placeholder="Nome")}}
+            {{render_field(form.cpf, class="form-control", placeholder="CPF")}}
+            {{render_field(form.phone, class="form-control", placeholder="Telefone")}}
+            {{render_field(form.email, class="form-control", placeholder="E-mail")}}
+            {{render_field(form.password, class="form-control", placeholder="Senha", type="password")}}
+
+            <button type="submit" class="btn btn-outline-info mt-5"> atualizar Produto </button>
+            
+        </form>
+    </div>
+
+    <div class="col-md-2"></div>
+</div>
+</div>
+
+
+{% endblock %}

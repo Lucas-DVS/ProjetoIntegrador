@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session, current_app
-from .models import User, Product
+from .models import User, Product, Order
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db, photos, search
 from flask_login import login_user, login_required, logout_user, current_user # objetos que contem as funções de validações de login e logout
-from .forms import addProducts
+from .forms import addProducts, attUser
 import secrets, os
 
 auth = Blueprint('auth', __name__) #Aqui ficarão as blueprints que irão renderizar os templates. 
@@ -256,10 +256,99 @@ def deleteitem(id):
         return redirect(url_for('auth.getCart'))
     
 
-@auth.route('/clearcart')
+@auth.route('/clearcart') # limpando carrinho
 def clearcart():
     try:
         session.pop('Shoppingcart', None)
         return redirect(url_for('auth.home'))
     except Exception as e:
         print(e)
+
+
+@auth.route('/updateuserinfo/<int:id>', methods=['GET', 'POST']) # URL do updateproduct - Função para atualizar os usuários CONTINUAR 
+def updateuserinfo(id):
+    user = User.query.get_or_404(id) # pegando os dados do produto no database pelo ID 
+    form = attUser(request.form)
+
+    # Preenchendo os campos com os dados que foram recuparados do banco de dados. 
+    form.firstName.data = user.firstName
+    form.cpf.data = user.cpf
+    form.phone.data = user.phone 
+    form.email.data = user.email 
+    form.password.data = user.password 
+
+    return render_template("updateuserinfo.html", user=current_user, form=form, infoUser = user)
+
+"""
+def updateProduct(id):
+    product = Product.query.get_or_404(id) # pegando os dados do produto no database pelo ID 
+    form = addProducts(request.form)
+
+    #Alterando o banco de dados com as informações inseridas no formulário
+    if request.method == "POST":
+        product.name = form.name.data
+        product.price = form.price.data
+        product.discount = form.discount.data
+        product.stock = form.stock.data
+        product.description = form.description.data
+        if request.files.get('image'):
+            try:
+                os.unlink(os.path.join(current_app.root_path, "static/images/" + product.img))
+                product.img = photos.save(request.files.get('image'), name=secrets.token_hex(10) + ".") # Realizar o upload das imagens enviadas na pagina adicionar produtos
+            except:
+                product.img = photos.save(request.files.get('image'), name=secrets.token_hex(10) + ".") # Realizar o upload das imagens enviadas na pagina adicionar produtos
+        db.session.commit()
+        flash(f'Seu produto foi atulizado', 'sucess')
+        return redirect(url_for('auth.stock')) # Redirecionando usuário para a login page
+    
+    # Preenchendo os campos com os dados que foram recuparados do banco de dados. 
+    form.name.data = product.name
+    form.price.data = product.price
+    form.discount.data = product.discount
+    form.stock.data = product.stock
+    form.description.data = product.description
+
+    return render_template("updateProduct.html", user=current_user, form=form, product=product)
+
+"""
+
+@auth.route('/getorder') # Função que finaliza o pedido
+@login_required # Decorador que só vai permitir acesso ao logout caso o usuário estiver logado.
+def get_order():
+    if current_user.is_authenticated:
+        userId = current_user.id
+        total = secrets.token_hex(5)
+        try:
+            order = Order(total=total, userId=userId, orders=session['Shoppingcart'])
+            db.session.add(order)
+            db.session.commit()
+            session.pop('Shoppingcart')
+            flash('Seu pedido foi enviado', 'sucess')
+            return redirect(url_for('auth.orders', total=total))
+        except Exception as e:
+            print(e)
+            flash('Algo deu errado obtendo o pedido', 'danger')
+            return redirect(url_for('auth.getCart'))
+
+
+@auth.route('/orders/<total>')
+@login_required # Decorador que só vai permitir acesso ao logout caso o usuário estiver logado.
+def orders(total):
+    if current_user.is_authenticated:
+        totalDoPedido = 0
+        subtotal = 0
+        customer_id = current_user.id
+        customer = User.query.filter_by(id=customer_id).first()
+        orders = Order.query.filter_by(userId=customer_id).order_by(Order.id.desc()).first() # Aqui ele sempre vai pegar o ultimo total"identificação do pedido" CONTINUAR
+        for _key, product in orders.orders.items():
+            subtotal += float(product['price']) * int(product['quantity'])
+            discount = subtotal * (product['discount']/100)
+            subtotal -= discount
+            totalDoPedido += float("%.2f" % (subtotal))
+            discount = 0
+            subtotal = 0
+
+    else:
+        return redirect(url_for('auth.login'))
+    return render_template('/order.html', user=current_user, total=total, subtotal=subtotal, totalDoPedido=totalDoPedido, customer=customer, orders=orders)
+    

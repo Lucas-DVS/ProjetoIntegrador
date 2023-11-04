@@ -47,10 +47,11 @@
           <a class="nav-item nav-link" id="home" href="/" style="color: aliceblue">Home</a>
           <a class="nav-item nav-link" id="addProduct" href="/addProduct"  style="color: aliceblue">Adicionar produto</a>
           <a class="nav-item nav-link" id="stock" href="/stock"  style="color: aliceblue">Estoque</a>
+          <a class="nav-item nav-link" id="user" href="{{url_for('auth.updateuserinfo', id=user.id)}}"  style="color: aliceblue">Meu perfil</a> <!--Passando o id do usuário no request-->
           <li class="nav-item">
             <a class="nav-link disable" href="{{url_for('auth.getCart')}}" style="color: aliceblue" tabindex="-1">Carrinho({{session['Shoppingcart']|length}})</a>
           </li>
-          <a class="nav-item nav-link" id="logout" href="/logout"  style="color: aliceblue" data-toggle="modal" data-target="#modalExemplo">Logout</a>
+          <a class="nav-item nav-link" id="logout" href="{{url_for('auth.logout')}}"  style="color: aliceblue" data-toggle="modal" data-target="#modalExemplo">Logout</a>
           {%else %} <!--Caso o usuário não esteja logado, exibir a pagina de login e sign-up-->
           <a class="nav-item nav-link" id="login" href="/login" style="color: aliceblue">Login</a>
           <a class="nav-item nav-link" id="signUp" href="/sign-up" style="color: aliceblue">Sign Up</a>
