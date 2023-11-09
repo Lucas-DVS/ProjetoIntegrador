@@ -1,0 +1,36 @@
+{% extends "base.html" %} {% block title %}Pedidos{% endblock %} {% block
+    content %}
+
+    <br />
+    <h3 align="center">Histórico de pedidos</h3>
+    
+    <div class="container mt-5">
+      <table class="table table-sm table-condensed table-striped">
+        <thead>
+          <th>Pedido</th>
+          <th>Status</th>
+          <th>Data</th>
+          <th>Detalhes</th>
+        </thead>
+        <tbody>
+          {% for orders in orders %}
+          <tr>
+            <td>{{orders.total}}</td>
+            <td>{{orders.status}}</td>
+            <td>{{orders.date}}</td>
+            <td><a href="{{url_for('auth.userOrders', total=orders.total)}}" class="btn btn-info btn-sm">Detalhes</a></td> <!-- Chamar a função userOrders passando como parametro o valor do campo Total(pedido) seleciondo-->
+          {% endfor %}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <br />
+    <footer class="text-light">
+      <div class="text-center" style="background-color: #d85372; padding: 20px;" >
+        &copy 2023 Copyright: <a href="#" style="color: aliceblue;">Cupcakes Gourmet</a>
+      </div>
+    </footer>
+    
+    {% endblock %}
+    

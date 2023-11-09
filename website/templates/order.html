@@ -30,9 +30,8 @@
                 <tr>
                     <td>{{loop.index}}</td>
                     <td>{{product.name}}</td>
-                    <form action="{{url_for('auth.updatecart', code=key)}}" method="post">
                     <td>R${{product.price}}</td>
-                    <td><input type="number" name="quantity" min="1" max="10" value="{{product.quantity}}"></td>
+                    <td>{{product.quantity}}</td>
                     {% if product.discount > 0 %}
                     <td>{{product.discount}}%</td>
                     {% else %}
@@ -45,12 +44,37 @@
         </table>
         <table class="table table-sm">
             <tr>
-                <td><a href="#" class="btn btn-success">Finalizar pedido</a></td>
-                <td><h5 style="float: right;">Total: R${{"%0.2f"|format(totalDoPedido|float)}}</h5></td>
+                <td>
+                    {% if orders.status == 'Pago' %}
+                    {% else %}
+                         <form action="{{url_for('auth.payment')}}" method="POST">
+                             {% set amount = somaTotal.replace('.', '') %}
+                            <input type="hidden" name="amount" value="{{amount}}">
+                            <input type="hidden" name="total" value="{{orders.total}}">
+                            <script
+                                src="https://checkout.stripe.com/checkout.js"
+                                class="stripe-button"
+                                data-key="pk_test_51O9dwrLWAB2Es0IYTsEktdoO1rGSlKbduA073KdZlFpPX1AkTp6Xb8G4n1lS7a0xDya9cj9vuzPgECal80ivrcXB00XuURtg8M"
+                                data-name="Cupcake gourmet"
+                                data-description="Número do seu pedido: {{orders.total}}"
+                                data-amount="{{(amount)}}" 
+                                data-currency="brl">
+                            </script> 
+                        </form>
+                    {% endif %}
+                </td>
+                <td><h5 style="float: right;">Total: R${{"%0.2f"|format(somaTotal|float)}}</h5></td>
             </tr>
-        </table>
+        </table> 
       </div>
    </div>
 </div>
+
+<br />
+<footer class="text-light">
+    <div class="text-center" style="background-color: #d85372; padding: 20px;" >
+      &copy 2023 Copyright: <a href="#" style="color: aliceblue;">Cupcakes Gourmet</a>
+    </div>
+</footer>
 
 {% endblock %}

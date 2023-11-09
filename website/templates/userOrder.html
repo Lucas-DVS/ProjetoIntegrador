@@ -1,0 +1,44 @@
+{% extends "base.html" %} {% block title %}{% endblock %} {% block
+    content %}
+
+    <br />
+    <h3 align="center">Detalhe do pedido: {{total}}</h3>
+    <br />
+
+    <table class="table table-sm">
+        <thead>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Preço</th>
+            <th>Quantidade</th>
+            <th>Desconto</th>
+            <th>Subtotal</th>
+        </thead>
+        <tbody>
+            {% for key, product in orders.orders.items() %}
+            {% set discount = product.discount/100 %}
+            
+            <tr>
+                <td>{{loop.index}}</td>
+                <td>{{product.name}}</td>
+                <td>R${{product.price}}</td>
+                <td>{{product.quantity}}</td>
+                {% if product.discount > 0 %}
+                <td>{{product.discount}}%</td>
+                {% else %}
+                <td></td>
+                {% endif %}
+                {% set subtotal = product.quantity|int * product.price|float %}
+                <td>R${{"%0.2f"|format((subtotal|float) - (subtotal|float * discount|float))}}</td>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <br />
+    <footer class="text-light">
+      <div class="text-center" style="background-color: #d85372; padding: 20px;" >
+        &copy 2023 Copyright: <a href="#" style="color: aliceblue;">Cupcakes Gourmet</a>
+      </div>
+    </footer>
+    
+    {% endblock %}

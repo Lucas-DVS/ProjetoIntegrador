@@ -44,8 +44,8 @@ class JsonEcodeDict(db.TypeDecorator): # Classe para pegar uma lista com os pedi
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    total = db.Column(db.String(20), unique=True, nullable=False) # Identificação do pedido. 
-    status = db.Column(db.String(20), default='Pending', nullable=False)
+    total = db.Column(db.String(20), unique=True, nullable=False) # Identificação do pedido(invoice). 
+    status = db.Column(db.String(20), default='Pendente', nullable=False)
     userId = db.Column(db.Integer, unique=False, nullable=False)
     date = db.Column(db.DateTime(timezone = True), default=func.now(), nullable=False)
     orders = db.Column(JsonEcodeDict)

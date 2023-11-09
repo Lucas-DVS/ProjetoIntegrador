@@ -3,10 +3,44 @@ from .models import User, Product, Order
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db, photos, search
 from flask_login import login_user, login_required, logout_user, current_user # objetos que contem as funções de validações de login e logout
-from .forms import addProducts, attUser
+from .forms import addProducts, attUser, attpass
 import secrets, os
+import stripe
+
 
 auth = Blueprint('auth', __name__) #Aqui ficarão as blueprints que irão renderizar os templates. 
+
+chave_publicavel = 'pk_test_51O9dwrLWAB2Es0IYTsEktdoO1rGSlKbduA073KdZlFpPX1AkTp6Xb8G4n1lS7a0xDya9cj9vuzPgECal80ivrcXB00XuURtg8M'
+
+stripe.api_key = 'sk_test_51O9dwrLWAB2Es0IYvrEMRkV3CX449tbmRpo3E2l4Cz3gkhgoa0TNHbvWMud3KKhppBZgrYRpIwmsoZQN6277OelG00hUywv6Zu'
+
+@auth.route('/payment', methods=['POST'])
+@login_required # Decorador que só vai permitir acesso ao logout caso o usuário estiver logado.  
+def payment():
+
+    total = request.form.get('total')
+    amount = request.form.get('amount')
+    customer = stripe.Customer.create(
+        email=request.form['stripeEmail'],
+        source=request.form['stripeToken'],
+    )
+
+    charge = stripe.Charge.create(
+        customer=customer.id,
+        description='Cupcake gourmet',
+        amount=amount,
+        currency='brl',
+    )
+
+    orders = Order.query.filter_by(userId=current_user.id, total = total).order_by(Order.id.desc()).first() # Aqui ele sempre vai pegar o ultimo total"identificação do pedido" CONTINUAR
+    orders.status = 'Pago'
+    db.session.commit()
+    return redirect(url_for('auth.obrigado'))
+
+@auth.route('/obrigado')
+def obrigado():
+    return render_template("thank.html", user=current_user)
+
 
 @auth.route('/') #Home
 def home():
@@ -49,6 +83,7 @@ def login():
 @auth.route('/logout')
 @login_required # Decorador que só vai permitir acesso ao logout caso o usuário estiver logado. 
 def logout():
+    clearcart()
     logout_user() # função que irá deslogar o usuário que estiver logado na sessão
     flash('Logout efeutado com sucesso', category='sucess') #Mensagem de sucesso
     return redirect(url_for('auth.login'))
@@ -270,47 +305,66 @@ def updateuserinfo(id):
     user = User.query.get_or_404(id) # pegando os dados do produto no database pelo ID 
     form = attUser(request.form)
 
+    if request.method == "POST":
+        user.firstName = form.firstName.data
+        user.phone = form.phone.data
+        user.email = form.email.data
+        db.session.commit()
+        flash(f'Seu perfil foi atulizado', 'sucess')
+        return redirect(url_for('auth.home')) 
+    
     # Preenchendo os campos com os dados que foram recuparados do banco de dados. 
     form.firstName.data = user.firstName
     form.cpf.data = user.cpf
     form.phone.data = user.phone 
     form.email.data = user.email 
-    form.password.data = user.password 
+    #form.password.data = user.password 
 
     return render_template("updateuserinfo.html", user=current_user, form=form, infoUser = user)
 
-"""
-def updateProduct(id):
-    product = Product.query.get_or_404(id) # pegando os dados do produto no database pelo ID 
-    form = addProducts(request.form)
+@auth.route('/alterpass/<int:id>', methods=['GET', 'POST'])
+def alterpass(id):
+    user = User.query.get_or_404(id) # pegando os dados do produto no database pelo ID 
+    form = attpass(request.form)
 
-    #Alterando o banco de dados com as informações inseridas no formulário
-    if request.method == "POST":
-        product.name = form.name.data
-        product.price = form.price.data
-        product.discount = form.discount.data
-        product.stock = form.stock.data
-        product.description = form.description.data
-        if request.files.get('image'):
-            try:
-                os.unlink(os.path.join(current_app.root_path, "static/images/" + product.img))
-                product.img = photos.save(request.files.get('image'), name=secrets.token_hex(10) + ".") # Realizar o upload das imagens enviadas na pagina adicionar produtos
-            except:
-                product.img = photos.save(request.files.get('image'), name=secrets.token_hex(10) + ".") # Realizar o upload das imagens enviadas na pagina adicionar produtos
-        db.session.commit()
-        flash(f'Seu produto foi atulizado', 'sucess')
-        return redirect(url_for('auth.stock')) # Redirecionando usuário para a login page
+    if request.method == 'POST':
+
+        passcurrent = form.passcurrent.data
+        password1 = form.password1.data
+        password2 = form.password2.data
+        SpecialSym =['$', '@', '#', '%'] # Simbolos especiais. 
     
-    # Preenchendo os campos com os dados que foram recuparados do banco de dados. 
-    form.name.data = product.name
-    form.price.data = product.price
-    form.discount.data = product.discount
-    form.stock.data = product.stock
-    form.description.data = product.description
+        if check_password_hash(user.password, passcurrent): # checar se as senhas estão iguais
+            login_user(user, remember=True) # Função que valida se o usuário está logado. 
+            if password1 != password2:
+                flash('A nova senha não está igual!', category='error') # Function to validate the password <<
+            elif len(password1) < 7:
+                flash('Senha deve conter ao menos 7 caracteres', category='error') 
+            elif len(password1) > 20:
+                flash('Senha não pode ter mais que 20 caracteres', category='error')
+            elif not any(char.isdigit() for char in password1):
+                flash('Senha deve ter ao menos um numeral', category='error')
+            elif not any(char.isupper() for char in password1):
+                flash('Senha deve ter ao menos uma letra maiúsculas', category='error')
+            elif not any(char.islower() for char in password1):
+                flash('Senha deve ter ao menos uma letra minúsculas', category='error')
+            elif not any(char in SpecialSym for char in password1):
+                flash('Senha deve conter um desses símbolos: $@#', category='error') # Function to validate the password >>
+            else:
+                user.password = generate_password_hash(password1, method='sha256')
+                db.session.commit()
+                flash('Senha alterada com sucesso', category='success')
+                return redirect(url_for('auth.updateuserinfo', id=user.id)) 
+        else:
+            flash('Senha atual incorreta', category='error')
 
-    return render_template("updateProduct.html", user=current_user, form=form, product=product)
+    return render_template("alterpass.html", user=current_user, form=form)
 
-"""
+def updateshoppingcart(): #Remover as imagens na hora de salvar o pedido no banco de dados
+    for _key, product in session['Shoppingcart'].items():
+        session.modified = True
+        del product['image']
+    return updateshoppingcart
 
 @auth.route('/getorder') # Função que finaliza o pedido
 @login_required # Decorador que só vai permitir acesso ao logout caso o usuário estiver logado.
@@ -318,6 +372,7 @@ def get_order():
     if current_user.is_authenticated:
         userId = current_user.id
         total = secrets.token_hex(5)
+        updateshoppingcart()
         try:
             order = Order(total=total, userId=userId, orders=session['Shoppingcart'])
             db.session.add(order)
@@ -331,7 +386,7 @@ def get_order():
             return redirect(url_for('auth.getCart'))
 
 
-@auth.route('/orders/<total>')
+@auth.route('/orders/<total>') # pagina do pedido
 @login_required # Decorador que só vai permitir acesso ao logout caso o usuário estiver logado.
 def orders(total):
     if current_user.is_authenticated:
@@ -339,7 +394,7 @@ def orders(total):
         subtotal = 0
         customer_id = current_user.id
         customer = User.query.filter_by(id=customer_id).first()
-        orders = Order.query.filter_by(userId=customer_id).order_by(Order.id.desc()).first() # Aqui ele sempre vai pegar o ultimo total"identificação do pedido" CONTINUAR
+        orders = Order.query.filter_by(userId=customer_id).order_by(Order.id.desc()).first() # Aqui ele sempre vai pegar o ultimo total"identificação do pedido" 
         for _key, product in orders.orders.items():
             subtotal += float(product['price']) * int(product['quantity'])
             discount = subtotal * (product['discount']/100)
@@ -348,7 +403,46 @@ def orders(total):
             discount = 0
             subtotal = 0
 
+        somaTotal = ("%.2f" % float((totalDoPedido)))
+
     else:
-        return redirect(url_for('auth.login'))
-    return render_template('/order.html', user=current_user, total=total, subtotal=subtotal, totalDoPedido=totalDoPedido, customer=customer, orders=orders)
+        return redirect(url_for('auth.home'))
+    return render_template('/order.html', user=current_user, total=total, subtotal=subtotal, somaTotal=somaTotal, customer=customer, orders=orders)
+
+
+@auth.route('/allorders', methods=['GET', 'POST']) # Histórico de pedidos
+@login_required # Decorador que só vai permitir acesso ao logout caso o usuário estiver logado.
+def allorders():
+
+    if current_user.is_authenticated:
+        
+        customer_id = current_user.id
+        orders = Order.query.filter_by(userId=customer_id)
+
+    return render_template('/allorders.html', user=current_user, orders=orders)
+
+
+@auth.route('/userorders/<total>', methods=['GET', 'POST']) # Detalhe do pedido
+@login_required # Decorador que só vai permitir acesso ao logout caso o usuário estiver logado.
+def userOrders(total):
     
+    if current_user.is_authenticated:
+        totalDoPedido = 0
+        subtotal = 0
+        customer_id = current_user.id
+        customer = User.query.filter_by(id=customer_id).first()
+        orders = Order.query.filter_by(total=total).order_by(Order.id.desc()).first() # Aqui ele sempre vai pegar o ultimo total"identificação do pedido"
+        for _key, product in orders.orders.items():
+            subtotal += float(product['price']) * int(product['quantity'])
+            discount = subtotal * (product['discount']/100)
+            subtotal -= discount
+            totalDoPedido += float("%.2f" % (subtotal))
+            discount = 0
+            subtotal = 0
+        
+        somaTotal = ("%.2f" % float((totalDoPedido)))
+
+    return render_template('/userOrder.html', user=current_user, subtotal=subtotal, somaTotal=somaTotal, customer=customer, orders=orders, total=total)
+
+
+
