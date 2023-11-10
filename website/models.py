@@ -11,7 +11,6 @@ class User(db.Model, UserMixin):
     phone = db.Column(db.Integer)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(20))
-    address = db.Column(db.String(20))
     notes = db.relationship('Order')
 
 class Product(db.Model):
