@@ -1,34 +1,36 @@
-{% extends "base.html" %} {% block title %}Sign up{% endblock %} {% block
+{% extends "base.html" %} {% block title %}Cadastro{% endblock %} {% block
 content %}
 <form method="POST">
   <br />
-  <h3 align="center">Sign up</h3>
+  <h3 align="center">Cadastro</h3>
   <div class="form-group">
-    <label for="firstName">First Name</label>
-    <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter first name"/>
+    <label for="firstName">Nome</label>
+    <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Informe o nome"/>
   </div>
   <div class="form-group">
     <label for="cpf">CPF</label>
-    <input type="text" class="form-control" id="cpf" name="cpf" placeholder="Enter your CPF"/>
+    <input type="text" class="form-control" id="cpf" name="cpf" placeholder="Informe o CPF"/>
   </div>
   <div class="form-group">
-    <label for="phone">Phone</label>
-    <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter your phone"/>
+    <label for="phone">Telefone</label>
+    <input type="text" class="form-control" id="phone" name="phone" placeholder="Informe o Telefone"/>
   </div>
   <div class="form-group">
-    <label for="email">E-mail Address</label>
-    <input type="email" class="form-control" id="email" name="email" placeholder="Enter e-mail"/>
+    <label for="email">E-mail</label>
+    <input type="email" class="form-control" id="email" name="email" placeholder="Informe o e-mail"/>
   </div>
   <div class="form-group">
-    <label for="password1">Password</label>
-    <input type="password" class="form-control" id="password1" name="password1" placeholder="Enter your password"/>
+    <label for="password1">Senha</label>
+    <input type="password" class="form-control" id="password1" name="password1" placeholder="Informe a senha"/>
   </div>
   <div class="form-group">
-    <label for="password2">Password (Confirm)</label>
-    <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm your password"/>
+    <label for="password2">Senha (Confirme)</label>
+    <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirme a senha"/>
   </div>
+  <label for="note" align="left">A senha deve ter letras minúsculas, maiúsculas, números e caracteres especiais</label>
   <br />
-  <button type="submit" class="btn btn-primary">Submit</button>
+  <br />
+  <button type="submit" class="btn btn-primary">Enviar</button>
 </form>
 
 <br />
