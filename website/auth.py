@@ -128,7 +128,7 @@ def sign_up():
             new_user = User(firstName=firstName, cpf=cpf, phone=phone, email=email, password=generate_password_hash(password1, method='sha256'))
             db.session.add(new_user) #Adicionando novo usuário no banco de dados
             db.session.commit() #efetuando commit
-            flash('Account created!', category='sucess') #Mensagem de sucesso
+            flash('Conta Criada!', category='sucess') #Mensagem de sucesso
             return redirect(url_for('auth.login')) # Redirecionando usuário para a login page
 
     return render_template("sign_up.html", user=current_user)
